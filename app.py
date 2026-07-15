@@ -11,5 +11,8 @@ def divide(a, b):
         raise ValueError("Divisor cannot be zero")
 
     return a / b 
+
+def power(base, exponent):
+    return base ** exponent
 if __name__ == "__main__":
     print(add(2,3))
