@@ -14,5 +14,8 @@ def divide(a, b):
 
 def power(base, exponent):
     return base ** exponent
+
+def square(number):
+    return number ** 2
 if __name__ == "__main__":
     print(add(2,3))
