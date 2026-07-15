@@ -1,4 +1,4 @@
-from app import power
+from app import power, square
 
 
 def test_power_with_positive_exponent():
@@ -11,3 +11,9 @@ def test_power_with_zero_exponent():
 
 def test_power_with_negative_exponent():
     assert power(2, -1) == 0.5
+
+
+
+
+def test_square():
+    assert square(4) == 16
