@@ -1,2 +1,2 @@
 ENVIRONMENT = "local"
-MESSAGE = "Application is running"
+MESSAGE = "Application is running in development"
