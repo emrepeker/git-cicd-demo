@@ -1,0 +1,72 @@
+name: Mock CD
+
+on:
+  workflow_run:
+    workflows:
+      - Python CI
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deployment-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-development:
+    name: Deploy to Development
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'dev'
+
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Run development deployment
+        run: |
+          chmod +x scripts/deploy.sh
+          ./scripts/deploy.sh development "${{ github.event.workflow_run.head_sha }}"
+
+      - name: Add deployment summary
+        run: |
+          echo "## Development Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: development" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: ${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: successful" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy to Production
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Run production deployment
+        run: |
+          chmod +x scripts/deploy.sh
+          ./scripts/deploy.sh production "${{ github.event.workflow_run.head_sha }}"
+
+      - name: Add deployment summary
+        run: |
+          echo "## Production Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: production" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: ${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: successful" >> "$GITHUB_STEP_SUMMARY"
